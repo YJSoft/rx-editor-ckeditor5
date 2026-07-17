@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { chromium } from 'playwright';
 
-const bundlePath = new URL('../dist/ckeditor5.min.js', import.meta.url).pathname;
+const bundlePath = new URL('../dist/ckeditor5.js', import.meta.url).pathname;
 const stylesheetPath = new URL("../dist/ckeditor5.css", import.meta.url).pathname;
 const skinSource = readFileSync(new URL("../css/rhymix.scss", import.meta.url), "utf8");
 const toolbarLayoutStyles = skinSource.match(/\/\* Toolbar toggle layout: start \*\/([\s\S]*?)\/\* Toolbar toggle layout: end \*\//)?.[1] || "";

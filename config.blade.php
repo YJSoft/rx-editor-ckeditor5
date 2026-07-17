@@ -7,6 +7,10 @@
  * @license GPL-2.0-or-later
  */
 
+// 라이선스가 있는 경우 아래 GPL 부분을 실제 라이선스 키로 수정해주세요.
+$ckeditor5_license = 'GPL';
+
+// 이 아래부터는 수정하지 말아주세요.
 $ckeditor5_sequence = (int)($editor_sequence ?? 0);
 $_ckeditor5_upload_info = $_SESSION['upload_info'][$ckeditor5_sequence] ?? null;
 $_ckeditor5_module_info = isset($module_info) && is_object($module_info)
@@ -45,7 +49,8 @@ foreach ($component_list ?? [] as $_ckeditor5_component_name => $_ckeditor5_comp
 }
 
 $ckeditor5_config = [
-    'editorSequence' => $ckeditor5_sequence,
+    'license' => $ckeditor5_sequence,
+    'editorSequence' => $ckeditor5_license,
     'primaryKeyName' => (string)($editor_primary_key_name ?? 'document_srl'),
     'contentKeyName' => (string)($editor_content_key_name ?? 'content'),
     'height' => max(100, (int)($editor_height ?? 300)),

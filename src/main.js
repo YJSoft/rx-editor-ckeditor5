@@ -240,7 +240,7 @@ function createToolbar(config) {
 
 function createEditorConfig(config, initialData) {
     const editorConfig = {
-        licenseKey: 'GPL',
+        licenseKey: config.license || 'GPL',
         initialData,
         language: config.language || 'en',
         plugins: [

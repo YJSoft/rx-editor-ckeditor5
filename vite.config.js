@@ -10,7 +10,7 @@ export default defineConfig({
         lib: {
             entry: 'src/main.js',
             formats: ['es'],
-            fileName: () => 'ckeditor5.min.js',
+            fileName: () => 'ckeditor5.js',
             cssFileName: 'ckeditor5',
         },
         rollupOptions: {
