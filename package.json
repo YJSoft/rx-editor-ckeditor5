@@ -1,0 +1,20 @@
+{
+  "name": "rhymix-ckeditor5-skin",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Self-hosted CKEditor 5 editor skin for Rhymix",
+  "author": "YJSoft <yjsoft@yjsoft.xyz>",
+  "license": "GPL-2.0-or-later",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "test:runtime": "PLAYWRIGHT_BROWSERS_PATH=./node_modules/.cache/ms-playwright node tests/runtime.mjs"
+  },
+  "dependencies": {
+    "ckeditor5": "48.3.1"
+  },
+  "devDependencies": {
+    "playwright": "1.61.1",
+    "vite": "8.1.5"
+  }
+}

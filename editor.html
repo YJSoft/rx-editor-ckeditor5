@@ -1,0 +1,32 @@
+<config autoescape="on" />
+
+<include target="config.blade.php" />
+
+<load target="dist/ckeditor5.css" />
+<load target="css/rhymix.scss" vars="$ckeditor5_css_vars" />
+<load target="^/common/css/xeicon/xeicon.min.css" />
+<load target="../../tpl/js/editor_common.js" />
+<load target="dist/ckeditor5.min.js" type="module" />
+
+<div id="ckeditor5_instance_{$editor_sequence}" class="rx-ckeditor5 rx-ckeditor5--{$ckeditor5_colorset}"
+    data-editor-sequence="{$editor_sequence}"
+    data-editor-primary-key-name="{$editor_primary_key_name}"
+    data-editor-content-key-name="{$editor_content_key_name}"
+    data-editor-config="{$ckeditor5_config_json}"
+    style="--rx-ckeditor5-height: {$ckeditor5_config['height']}px;">
+    <div class="rx-ckeditor5__loading" role="status" aria-live="polite">CKEditor 5</div>
+    <div class="rx-ckeditor5__source"></div>
+</div>
+
+<!--@if($enable_autosave)-->
+<p id="editor_autosaved_message_{$editor_sequence}" class="editor_autosaved_message autosave_message">&nbsp;</p>
+<input type="hidden" name="_saved_doc_title" value="{empty($saved_doc) ? '' : $saved_doc->title}" />
+<input type="hidden" name="_saved_doc_content" value="{empty($saved_doc) ? '' : $saved_doc->content}" />
+<input type="hidden" name="_saved_doc_document_srl" value="{empty($saved_doc) ? '' : $saved_doc->document_srl}" />
+<input type="hidden" name="_saved_doc_message" value="{$lang->msg_load_saved_doc}" />
+<script>window.auto_saved_msg = {$lang->msg_auto_saved|json|noescape};</script>
+<!--@endif-->
+
+<!--@if($allow_fileupload)-->
+<include target="../ckeditor/file_upload.html" />
+<!--@endif-->
