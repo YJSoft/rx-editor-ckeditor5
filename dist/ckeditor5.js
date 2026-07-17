@@ -43106,7 +43106,7 @@ function CV(e) {
 }
 function wV(e, t) {
 	let n = {
-		licenseKey: "GPL",
+		licenseKey: e.license || "GPL",
 		initialData: t,
 		language: e.language || "en",
 		plugins: [
