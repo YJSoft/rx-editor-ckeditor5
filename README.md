@@ -1,0 +1,1 @@
+# rx-editor-ckeditor5
