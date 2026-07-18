@@ -11,9 +11,16 @@ import { chromium } from 'playwright';
 
 const bundlePath = new URL('../dist/ckeditor5.js', import.meta.url).pathname;
 const stylesheetPath = new URL("../dist/ckeditor5.css", import.meta.url).pathname;
+const bundleSource = readFileSync(bundlePath, 'utf8');
+const stylesheetSource = readFileSync(stylesheetPath, 'utf8');
 const skinSource = readFileSync(new URL("../css/rhymix.scss", import.meta.url), "utf8");
 const toolbarLayoutStyles = skinSource.match(/\/\* Toolbar toggle layout: start \*\/([\s\S]*?)\/\* Toolbar toggle layout: end \*\//)?.[1] || "";
 const browser = await chromium.launch({ headless: true, args: ['--no-sandbox'] });
+
+for (const output of [bundleSource, stylesheetSource]) {
+    assert.doesNotMatch(output, /ck-powered-by/);
+    assert.doesNotMatch(output, /powered-by-ckeditor/);
+}
 
 function editorConfig(overrides = {}) {
     return {
@@ -94,6 +101,9 @@ async function testCoreAndComponents() {
     </body></html>`);
     await page.evaluate(configs => {
         window.editorRelKeys = [];
+        window.editorReplaceHTML = () => {
+            throw new Error('Legacy editorReplaceHTML fallback called');
+        };
         window.__componentCalls = [];
         window.openComponent = (name, sequence) => {
             window.__componentCalls.push({ name, sequence, nodeName: window.editorPrevNode?.nodeName || '' });
@@ -148,6 +158,13 @@ async function testCoreAndComponents() {
     });
 
     await page.evaluate(() => {
+        window.editorPrevSrl = 101;
+        const frame = window.editorGetIFrame(window.editorPrevSrl);
+        window.editorReplaceHTML(frame, '<p><span editor_component="emoticon" data-popup-insert="frame">frame component</span></p>');
+        window.editorReplaceHTML(document.createElement('div'), '<p><img src="/poll.png" poll_srl="123" editor_component="poll_maker"></p>');
+    });
+
+    await page.evaluate(() => {
         window._getCkeInstance(101).insertHtml("<p><span editor_component=\"emoticon\" data-test=\"kept\">component</span></p>");
         document.querySelector("#form101").dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
     });
@@ -161,6 +178,8 @@ async function testCoreAndComponents() {
     assert.match(synced.data, /editor_component="image_link"/);
     assert.match(synced.data, /data-file-srl="77"/);
     assert.match(synced.data, /data-test="kept"/);
+    assert.match(synced.data, /data-popup-insert="frame"/);
+    assert.match(synced.data, /poll_srl="123"/);
     assert.match(synced.second, /Initial 102/);
     const cleaned = await page.evaluate(() => {
         window._getCkeInstance(101).setData("<figure class=\"image\"><br data-cke-filler=\"true\"></figure><p>kept</p>");

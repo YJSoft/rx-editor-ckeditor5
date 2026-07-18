@@ -7,6 +7,8 @@
   "license": "GPL-2.0-or-later",
   "type": "module",
   "scripts": {
+    "patch:ckeditor": "node scripts/patch-ckeditor-powered-by.mjs",
+    "prebuild": "npm run patch:ckeditor",
     "build": "vite build",
     "test:runtime": "PLAYWRIGHT_BROWSERS_PATH=./node_modules/.cache/ms-playwright node tests/runtime.mjs"
   },

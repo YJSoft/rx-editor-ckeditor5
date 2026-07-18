@@ -583,6 +583,44 @@ function addToolbarToggle(bridge) {
     if (bridge.config.hideToolbar) bridge.wrapper.classList.add('rx-ckeditor5--toolbar-hidden');
 }
 
+function findBridgeForFrame(frame) {
+    const element = frame && frame.jquery ? frame[0] : frame;
+    const candidates = [
+        element?.dataset?.editorSequence,
+        element?.editor_sequence,
+        typeof element?.getAttribute === 'function' ? element.getAttribute('editor_sequence') : null,
+        typeof element?.getAttribute === 'function' ? element.getAttribute('data-editor-sequence') : null,
+        String(element?.id || '').match(/_(\d+)$/)?.[1],
+    ];
+
+    try {
+        candidates.push(element?.ckeditorInstance?.config?.get('rhymix.editorSequence'));
+    } catch (error) {
+        // A foreign editor object may expose a different config API. Try the remaining identifiers.
+    }
+
+    if (typeof element?.closest === 'function') {
+        candidates.push(element.closest('[data-editor-sequence]')?.dataset?.editorSequence);
+    }
+
+    for (const candidate of candidates) {
+        const bridge = registry[normalizeSequence(candidate)];
+        if (bridge) return bridge;
+    }
+
+    for (const bridge of Object.values(registry)) {
+        if (element === bridge.editable || element === bridge.wrapper) return bridge;
+        try {
+            if (element && bridge.wrapper.contains(element)) return bridge;
+        } catch (error) {
+            // Non-DOM compatibility objects cannot be passed to Node.contains().
+        }
+    }
+
+    // Rhymix sets editorPrevSrl before opening every editor component popup.
+    return registry[normalizeSequence(window.editorPrevSrl)] || null;
+}
+
 function installGlobals() {
     if (window.CKEditor5RhymixGlobalsInstalled) return;
     window.CKEditor5RhymixGlobalsInstalled = true;
@@ -611,8 +649,7 @@ function installGlobals() {
         return bridge ? bridge.editable : (typeof previous.getFrame === 'function' ? previous.getFrame(sequence) : null);
     };
     window.editorReplaceHTML = (frame, html) => {
-        const sequence = normalizeSequence(frame && (frame.dataset?.editorSequence || String(frame.id || '').replace(/^.*_/, '')));
-        const bridge = registry[sequence];
+        const bridge = findBridgeForFrame(frame);
         if (bridge) return bridge.compat.insertHtml(html, 'unfiltered_html');
         if (typeof previous.replaceHtml === 'function') return previous.replaceHtml(frame, html);
     };
@@ -714,8 +751,10 @@ async function initialize(wrapper) {
     const editor = bridge.editor = await ClassicEditor.create(source, editorConfig);
     bridge.editable = editor.ui.getEditableElement();
     bridge.editable.dataset.editorSequence = String(sequence);
+    bridge.editable.editor_sequence = sequence;
     bridge.editable.classList.add('rhymix_content', 'xe_content', 'editable');
     bridge.editable.setFocus = () => editor.editing.view.focus();
+    bridge.editable.replaceHTML = html => insertHtml(bridge, html);
     bridge.compat = createCompat(bridge);
 
     installUploadAdapter(editor, bridge);
