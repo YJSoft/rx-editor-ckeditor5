@@ -1,3 +1,5 @@
+@includeIf ('config.user')
+
 @php
 
 /**
@@ -7,8 +9,9 @@
  * @license GPL-2.0-or-later
  */
 
-// 라이선스가 있는 경우 아래 GPL 부분을 실제 라이선스 키로 수정해주세요.
-$ckeditor5_license = 'GPL';
+if (!isset($ckeditor5_license)) {
+    $ckeditor5_license = 'GPL';
+}
 
 // 이 아래부터는 수정하지 말아주세요.
 $ckeditor5_sequence = (int)($editor_sequence ?? 0);
