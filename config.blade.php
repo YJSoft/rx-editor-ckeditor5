@@ -49,8 +49,8 @@ foreach ($component_list ?? [] as $_ckeditor5_component_name => $_ckeditor5_comp
 }
 
 $ckeditor5_config = [
-    'license' => $ckeditor5_sequence,
-    'editorSequence' => $ckeditor5_license,
+    'license' => $ckeditor5_license,
+    'editorSequence' => $ckeditor5_sequence,
     'primaryKeyName' => (string)($editor_primary_key_name ?? 'document_srl'),
     'contentKeyName' => (string)($editor_content_key_name ?? 'content'),
     'height' => max(100, (int)($editor_height ?? 300)),

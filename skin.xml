@@ -4,7 +4,7 @@
 	<title xml:lang="ko">CKEditor 5</title>
 	<description xml:lang="en">CKEditor 5 editor skin for Rhymix</description>
 	<description xml:lang="ko">라이믹스용 CKEditor 5 에디터 스킨</description>
-	<version>0.1.1</version>
+	<version>0.1.2</version>
 	<date>2026-07-18</date>
 	<author email_address="yjsoft@yjsoft.xyz">
 		<name xml:lang="en">YJSoft</name>
