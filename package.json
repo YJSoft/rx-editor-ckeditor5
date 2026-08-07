@@ -13,7 +13,7 @@
     "test:runtime": "PLAYWRIGHT_BROWSERS_PATH=./node_modules/.cache/ms-playwright node tests/runtime.mjs"
   },
   "dependencies": {
-    "ckeditor5": "48.3.1"
+    "ckeditor5": "48.4.0"
   },
   "devDependencies": {
     "playwright": "1.61.1",
