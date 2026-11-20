@@ -3,6 +3,7 @@
 
 import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
+import postcss from 'postcss';
 
 const projectRoot = fileURLToPath(new URL('../', import.meta.url));
 const projectPackagePath = fileURLToPath(new URL('../package.json', import.meta.url));
@@ -66,23 +67,32 @@ async function patchUiSource() {
 }
 
 async function patchStylesheet() {
-    const marker = '/' + '* Rhymix build patch: CKEditor Powered by styles removed. *' + '/';
-    let stylesheet = await readFile(stylesheetPath, 'utf8');
+    const marker = 'Rhymix build patch: CKEditor Powered by styles removed.';
+    const stylesheet = await readFile(stylesheetPath, 'utf8');
 
-    if (stylesheet.includes(marker)) return;
+    if (stylesheet.includes(marker) && !stylesheet.includes('ck-powered-by')) return;
 
-    const start = stylesheet.indexOf(':root {\n  --ck-powered-by-font-size:');
-    const end = stylesheet.indexOf(':root {\n  --ck-evaluation-badge-font-size:', start);
+    const root = postcss.parse(stylesheet, { from: stylesheetPath });
+    let foundVariables = false;
+    let foundBalloon = false;
+    root.walkDecls(/^--ck-powered-by-/, declaration => {
+        declaration.remove();
+        foundVariables = true;
+    });
+    root.walkRules('.ck.ck-balloon-panel.ck-powered-by-balloon', rule => {
+        rule.replaceWith(postcss.comment({ text: marker }));
+        foundBalloon = true;
+    });
 
-    if (start === -1 || end === -1 || end <= start) {
+    const patched = root.toString();
+    if (!foundVariables || !foundBalloon || patched.includes('ck-powered-by')) {
         throw new Error(
             'Could not find the expected CKEditor Powered by styles in ' + stylesheetPath + '. ' +
             'The dependency layout may have changed; update the build patch.',
         );
     }
 
-    stylesheet = stylesheet.slice(0, start) + marker + '\n\n' + stylesheet.slice(end);
-    await writeFile(stylesheetPath, stylesheet);
+    await writeFile(stylesheetPath, patched);
 }
 
 await Promise.all([patchUiSource(), patchStylesheet()]);
